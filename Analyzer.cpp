@@ -82,10 +82,7 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position
 
   if (onVertical && onHorizontal) {
     // centered on a pixel
-    float t= SAMPLE(position);
-    cout << "Sample:" << t << endl;
-    return t;
-    // return SAMPLE(position);
+    return SAMPLE(position);
   }
 
   const unsigned int y0 = (unsigned int) floor(position.y);
