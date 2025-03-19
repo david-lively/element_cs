@@ -32,6 +32,8 @@ Disabling diagnoal interpolation brings these values within 1% of each other. Th
 
 I'd also like to incorporate a visualizer, or at at least mark visited cells in the color images and export a texture for analysis, so that I can see what's happening. While I started to put together a quick prototype, it would require more time than was alotted to complete. 
 
+The image below illustrates the output of the modified DDA (raycast) algorithm across a flat mesh, with horizontal, vertical and diagonal intersection calculation. (This is from a sandbox app I built just for experimentation with things like this. Unfortunately, that system is incompatible with this project, but it illustrates that the traversal logic is sound.)
+
 <img width="611" alt="image" src="https://github.com/user-attachments/assets/a25c955a-ae28-46e6-a61b-9ff3948e39b8" />
 
 
