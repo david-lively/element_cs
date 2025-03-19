@@ -20,7 +20,7 @@ Given the time, I'd write a comprehensive set of tests with known data and analy
 For those data sets, I'd test sampling only in X, only in Y and diagonals, and the sum of split segments. For instance, in the sample St. Helen's data, performing a sanity check by splitting the 0,0-511,511 diagnoal into two parts yields disappointing results:
 
 | start | end | pre | post | delta |
-------------------------------------
+| --- | --- | --- | --- | --- |
 |0,0 | 255,255 | 11297.7 | 11085.6 | -212.1 |
 |255,255 | 511,511 | 11472.5 | 11589.1 | 116.516 |
 |0,0 | 511,511 | 22883.9 | 22928.4 | 44.5039 |
