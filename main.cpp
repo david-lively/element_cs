@@ -46,12 +46,14 @@ int main(int argc, char** argv)
 
     Analyzer analyzer;
     Vec2 mapDims(512,512);
+    cout << "Loading maps...";
     analyzer.Load(mapDims,"data/st-helens/pre.data","data/st-helens/post.data");
-
+    cout << "Done." << endl;
     // runTests(analyzer);
 
     Vec2 start;
     Vec2 end;
+    cout << "Enter four integer values in x0 y0 x1 y1 order. Ctrl+C or -1 to exit." << endl;
     while (start.x != -1) {
         cout << ">";
         cin >> start.x;// >> start.y >> end.x >> end.y;
