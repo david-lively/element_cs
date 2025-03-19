@@ -58,12 +58,17 @@ Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
       result.y = FLOAT_MAX;
     }
   }
-
   return result;
 }
 
-float frac(float v) {
+template<typename T>
+T frac(T v) {
   return v - (int) v;
+}
+
+template<typename T>
+T clamp(T v) {
+  return v < 0 ? 0 : v > 1 ? 1 : v;
 }
 
 #define OFFSET_OF(p) ((unsigned int)p.y * m_mapDims.x + (unsigned int)p.x)
@@ -85,10 +90,13 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position
     return SAMPLE(position);
   }
 
+
   const unsigned int y0 = (unsigned int) floor(position.y);
   const unsigned int y1 = (unsigned int) ceil(position.y);
   const unsigned int x0 = (unsigned int) floor(position.x);
   const unsigned int x1 = (unsigned int) ceil(position.x);
+
+  // cout << position.x << " " << position.y << " " << x0 << " " << y0 << " " << x1 << " " << y1 << endl;
 
   float a = 0;
   float b = 0;
@@ -106,17 +114,23 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position
     lerpValue = frac(position.x);
   } else {
     // diagonal
-    a = buffer[y0 * m_mapDims.x + x1];
-    b = buffer[y1 * m_mapDims.x + x0];
+    // lower left sample
+    a = buffer[y1 * m_mapDims.x + x0];
+    // upper right sample
+    b = buffer[y0 * m_mapDims.x + x1];
+
     float fx = frac(position.x);
-    float fy = frac(position.y);
-    lerpValue = sqrt(fx * fx + fy * fy) / sqrt(2);
+    float fy = 1 - frac(position.y);
+    lerpValue = sqrt(fx*fx + fy*fy) / sqrt(2);
   }
-  assert(lerpValue >= 0 && lerpValue <= 1 && "Invalid lerp parameter.");
+  lerpValue = clamp(lerpValue);
   return a + (b - a) * lerpValue;
 }
 
 float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const float h1) {
+  /// scale to real world units.
+  /// 30 meters in x and y per unit,
+  /// 11 meters in height per unit.
   float dx = 30 * (p1.x - p0.x);
   float dy = 30 * (p1.y - p0.y);
   float dh = 11 * (h1 - h0);
@@ -133,8 +147,8 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
   float prevHeight = sample(heightMap, position);
 
   Vec2 stepSize;
-  stepSize.x = sqrt(1 + rayDir.y * rayDir.y / (rayDir.x * rayDir.x));
-  stepSize.y = sqrt(1 + rayDir.x * rayDir.x / (rayDir.y * rayDir.y));
+  stepSize.x = sqrt(1 + (rayDir.y * rayDir.y) / (rayDir.x * rayDir.x));
+  stepSize.y = sqrt(1 + (rayDir.x * rayDir.x) / (rayDir.y * rayDir.y));
 
   Vec2 rayLength;
   Vec2 stepDir;
@@ -178,26 +192,30 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
       intersection.x = start.x + rayDir.x * distance;
       intersection.y = start.y + rayDir.y * distance;
 
-      if (!intersection.equals(prev)) {
+      // if (!intersection.equals(prev))
+        {
         // check for diagonal intersection
         Vec2 di = getDiagonalIntersection(intersection, prev);
         if (di.x != FLOAT_MAX && di.y != FLOAT_MAX) {
+          // cout << "Diagonal " << di.x << " " << di.y << endl;
           float height = sample(heightMap, di);
-          float dh = getSpatialDistance(di, height, prev, prevHeight);
-          pathLength += dh;
+          pathLength += getSpatialDistance(di, height, prev, prevHeight);
           prevHeight = height;
           prev = di;
-        } {
-          float height = sample(heightMap, intersection);
-          float dh = getSpatialDistance(intersection, height, prev, prevHeight);
-          pathLength += dh;
-          prevHeight = height;
         }
+
+        // cout << position.x << " " << position.y << endl;
+
+        float height = sample(heightMap, intersection);
+        float dh = getSpatialDistance(intersection, height, prev, prevHeight);
+        pathLength += dh;
+        prevHeight = height;
+
       }
-      prev = intersection;;
+      prev = intersection;
     }
   }
-  cout << "Sampled " << numSamples << " points." << endl;
+  // cout << "Sampled " << numSamples << " points." << endl;
 
   return pathLength;
 }
@@ -249,7 +267,7 @@ Vec2 Analyzer::CalculatePathLengths(const Vec2& start, const Vec2& end) {
   Vec2 intersection;
   Vec2 prev = position;
 
-  int numSamples = 0;
+  int numSamples = 1;
 
   while (distance <= maxDistance) {
     if (rayLength.x < rayLength.y) {
@@ -262,17 +280,19 @@ Vec2 Analyzer::CalculatePathLengths(const Vec2& start, const Vec2& end) {
       rayLength.y += stepSize.y;
     }
 
-    if (distance <= maxDistance) {
-      ++numSamples;
+    if (distance <= maxDistance)
+      {
       // next intersection (on next integer coordinate transition)
       // doesn't check diagonals
       intersection.x = start.x + rayDir.x * distance;
       intersection.y = start.y + rayDir.y * distance;
 
-      if (!intersection.equals(prev)) {
+      //if (!intersection.equals(prev))
+        {
         // check for diagonal intersection
         Vec2 di = getDiagonalIntersection(intersection, prev);
         if (di.x != FLOAT_MAX && di.y != FLOAT_MAX) {
+          ++numSamples;
           Vec2 heights(sample(m_beforeData, di), sample(m_afterData, di));
           pathLengths.x += getSpatialDistance(di, heights.x, prev, prevHeights.x);
           pathLengths.y += getSpatialDistance(di, heights.y, prev, prevHeights.y);
@@ -280,6 +300,7 @@ Vec2 Analyzer::CalculatePathLengths(const Vec2& start, const Vec2& end) {
           prev = di;
         }
         {
+          ++numSamples;
           Vec2 heights(sample(m_beforeData, intersection), sample(m_afterData, intersection));
           pathLengths.x += getSpatialDistance(intersection, heights.x, prev, prevHeights.x);
           pathLengths.y += getSpatialDistance(intersection, heights.y, prev, prevHeights.y);
