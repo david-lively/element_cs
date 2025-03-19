@@ -8,7 +8,7 @@ Run.
 
 Follow the prompts to enter coordinates for the line to be measured. 
 
-#Known Issues
+# Known Issues
 Diagnoal calculation is off. I suspect an issue with sampling on diagonal edges. This is a solvable problem, but I wasn't able to correct the issue in the time alotted. 
 Some possibilities include accumulated floating point error, incorrect interpolation on diagonals, or some basic math assumption I made that is incorrect.
 Given the time, I'd write a comprehensive set of tests with known data and analytically calculable correct answers. For instance, 
