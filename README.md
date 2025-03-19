@@ -28,7 +28,7 @@ For those data sets, I'd test sampling only in X, only in Y and diagonals, and t
 
 Obviously, -212.1 + 116.516 = -95.84, not the calculated 44.5039. 
 
-Disabling diagnoal interpolation brings these values within 1% of each other. That's still a significant error that wouldn't be suitable for production, but, this could simply be an off-by-one error in raycast loop bounds. 
+Disabling diagnoal interpolation brings these values within 1% of each other. That's still a significant error that wouldn't be suitable for production, but, this could simply be an off-by-one error in raycast loop bounds. In either case, diagonal intersection detection and interpolation is necessary. I temporarily disabled it while testing to narrow down the source of the problem. 
 
 I'd also like to incorporate a visualizer, or at at least mark visited cells in the color images and export a texture for analysis, so that I can see what's happening. While I started to put together a quick prototype, it would require more time than was alotted to complete. 
 
