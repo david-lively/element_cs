@@ -16,6 +16,7 @@ Given the time, I'd write a comprehensive set of tests with known data and analy
 * A simple ramp (heights from 0 to 255 in X. I'd expect a result of
 * All zeros. (I actually have a test for this, and it gives dx * 30, as expected, in horizontal and vertical. Diagonals yield a small discrepency from expected value (which is one reason I suspect diagonal sampling is a problem)
 * All ones.
+* Check existing data sets against known correct results
 
 For those data sets, I'd test sampling only in X, only in Y and diagonals, and the sum of split segments. For instance, in the sample St. Helen's data, performing a sanity check by splitting the 0,0-511,511 diagnoal into two parts yields disappointing results:
 
