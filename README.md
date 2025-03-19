@@ -13,9 +13,9 @@ Diagnoal calculation is off. I suspect an issue with sampling on diagonal edges.
 Some possibilities include accumulated floating point error, incorrect interpolation on diagonals, or some basic math assumption I made that is incorrect.
 Given the time, I'd write a comprehensive set of tests with known data and analytically calculable correct answers. For instance, 
 
-* A simple ramp (heights from 0 to 255 in X. I'd expect a result of
+* A simple ramp (heights from 0 to 255 in X
 * All zeros. (I actually have a test for this, and it gives dx * 30, as expected, in horizontal and vertical. Diagonals yield a small discrepency from expected value (which is one reason I suspect diagonal sampling is a problem)
-* All ones.
+* All ones.  (Tested this; it gives the correc expected results.)
 * Check existing data sets against known correct results
 
 For those data sets, I'd test sampling only in X, only in Y and diagonals, and the sum of split segments. For instance, in the sample St. Helen's data, performing a sanity check by splitting the 0,0-511,511 diagnoal into two parts yields disappointing results:
