@@ -33,6 +33,10 @@ void Analyzer::Load(const Vec2& dims, const std::string& before, const std::stri
   m_mapDims = dims;
 }
 
+/*
+ *Calculates the intersection between two line segments a and b.
+ *I'm sure there is a better way to do this.
+ */
 Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
   float left = (int) ((a.x + b.x) / 2.0f);
   float top = (int) ((a.y + b.y) / 2.0f);
@@ -78,6 +82,16 @@ T clamp(T v) {
 #define OFFSET_OF(p) ((unsigned int)p.y * m_mapDims.x + (unsigned int)p.x)
 #define SAMPLE(p) buffer[OFFSET_OF(p)]
 
+/*
+ * Read an interpolated sample from the given buffer.
+ * Sample positions lying on an integer X will be interpolated between their
+ * left and right neighbors.
+ * Those on an integer Y will be intepolrated from their upper and lower neighbors.
+ * If the point is exactly on a pixel (within epsilon), no interpolation is performed.
+ * For sample positions within a cell, we assume it is on a diagonal edge. In that case,
+ * we sample the upper-right and lower-left adjacent values and lerp between them
+ * based on the sample's position on the diagonal.
+ */
 float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position) {
   assert(position.x >= 0 && position.x < m_mapDims.x
     && position.y >= 0 && position.y < m_mapDims.y
@@ -131,16 +145,22 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position
   return a + (b - a) * lerpValue;
 }
 
+/*
+ * Get the "real world" distance between two points (x,y, height)
+ */
 float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const float h1) {
   /// scale to real world units.
   /// 30 meters in x and y per unit,
-  /// 11 meters in height per unit.
   float dx = 30 * (p1.x - p0.x);
   float dy = 30 * (p1.y - p0.y);
+  /// 11 meters in height per unit.
   float dh = 11 * (h1 - h0);
   return sqrt(dx * dx + dy * dy + dh * dh);
 }
 
+/*
+ *Single-path version of CalculatePathLengths()
+ */
 float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& start, const Vec2& end) {
   Vec2 rayDir(end.x - start.x, end.y - start.y);
   float maxDistance = rayDir.length();
@@ -232,6 +252,10 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
  * (30 meters in X and Y, 11 meters in height (Z)
  * We then calculate the spatial distance between the current sample point and the previous
  * sample, and add that distance to the running totals in pathLengths.
+ *
+ * While it's more efficient to do both the old and new heightmaps at once since all of the
+ * sample positions are identical, in practice, this doesn't provide a noticable perf benefit
+ * vs running the single-path version once for each map.
  */
 Vec2 Analyzer::CalculatePathLengths(const Vec2& start, const Vec2& end) {
   Vec2 rayDir(end.x - start.x, end.y - start.y);
