@@ -24,5 +24,5 @@ public:
 
   float CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& start, const Vec2& end);
 
-  int CalculatePathLengthDelta(const Vec2& stat, const Vec2& end);
+  Vec2 CalculatePathLengths(const Vec2& start, const Vec2& end);
 };

@@ -112,9 +112,8 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& position
     float fy = frac(position.y);
     lerpValue = sqrt(fx * fx + fy * fy) / sqrt(2);
   }
-  float t = a + (b-a)*lerpValue;
-  cout << "Sample: " << t << endl;
-  return t;
+  assert(lerpValue >= 0 && lerpValue <= 1 && "Invalid lerp parameter.");
+  return a + (b - a) * lerpValue;
 }
 
 float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const float h1) {
@@ -159,6 +158,7 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
 
   Vec2 intersection;
   Vec2 prev = position;
+  int numSamples = 0;
 
   while (distance <= maxDistance) {
     if (rayLength.x < rayLength.y) {
@@ -172,6 +172,7 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     }
 
     if (distance <= maxDistance) {
+      ++numSamples;
       // next intersection (on next integer coordinate transition)
       // doesn't check diagonals
       intersection.x = start.x + rayDir.x * distance;
@@ -186,9 +187,7 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
           pathLength += dh;
           prevHeight = height;
           prev = di;
-        }
-
-        {
+        } {
           float height = sample(heightMap, intersection);
           float dh = getSpatialDistance(intersection, height, prev, prevHeight);
           pathLength += dh;
@@ -198,5 +197,99 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
       prev = intersection;;
     }
   }
+  cout << "Sampled " << numSamples << " points." << endl;
+
   return pathLength;
 }
+
+/*
+ * This method performs a 2D raycast through the source data.
+ * At each cell boundary or diagonal intersection, a height value is read
+ * from each of the source heightmaps.
+ * The sample point coordinates and height are then scaled to real-world dimensions
+ * (30 meters in X and Y, 11 meters in height (Z)
+ * We then calculate the spatial distance between the current sample point and the previous
+ * sample, and add that distance to the running totals in pathLengths.
+ */
+Vec2 Analyzer::CalculatePathLengths(const Vec2& start, const Vec2& end) {
+  Vec2 rayDir(end.x - start.x, end.y - start.y);
+  float maxDistance = rayDir.length();
+  rayDir.normalize();
+
+  Vec2 position = start;
+
+  // x is PRE data, y is POST data
+  Vec2 pathLengths;
+  Vec2 prevHeights(sample(m_beforeData, position), sample(m_afterData, position));
+
+  Vec2 stepSize;
+  stepSize.x = sqrt(1 + rayDir.y * rayDir.y / (rayDir.x * rayDir.x));
+  stepSize.y = sqrt(1 + rayDir.x * rayDir.x / (rayDir.y * rayDir.y));
+
+  Vec2 rayLength;
+  Vec2 stepDir;
+  float distance = 0.0f;
+
+  if (rayDir.x < 0) {
+    stepDir.x = -1;
+    rayLength.x = 0;
+  } else {
+    stepDir.x = 1;
+    rayLength.x = stepSize.x;
+  }
+
+  if (rayDir.y < 0) {
+    stepDir.y = -1;
+    rayLength.y = 0;
+  } else {
+    stepDir.y = 1;
+    rayLength.y = stepSize.y;
+  }
+
+  Vec2 intersection;
+  Vec2 prev = position;
+
+  int numSamples = 0;
+
+  while (distance <= maxDistance) {
+    if (rayLength.x < rayLength.y) {
+      position.x += stepDir.x;
+      distance = rayLength.x;
+      rayLength.x += stepSize.x;
+    } else {
+      position.y += stepDir.y;
+      distance = rayLength.y;
+      rayLength.y += stepSize.y;
+    }
+
+    if (distance <= maxDistance) {
+      ++numSamples;
+      // next intersection (on next integer coordinate transition)
+      // doesn't check diagonals
+      intersection.x = start.x + rayDir.x * distance;
+      intersection.y = start.y + rayDir.y * distance;
+
+      if (!intersection.equals(prev)) {
+        // check for diagonal intersection
+        Vec2 di = getDiagonalIntersection(intersection, prev);
+        if (di.x != FLOAT_MAX && di.y != FLOAT_MAX) {
+          Vec2 heights(sample(m_beforeData, di), sample(m_afterData, di));
+          pathLengths.x += getSpatialDistance(di, heights.x, prev, prevHeights.x);
+          pathLengths.y += getSpatialDistance(di, heights.y, prev, prevHeights.y);
+          prevHeights = heights;
+          prev = di;
+        }
+        {
+          Vec2 heights(sample(m_beforeData, intersection), sample(m_afterData, intersection));
+          pathLengths.x += getSpatialDistance(intersection, heights.x, prev, prevHeights.x);
+          pathLengths.y += getSpatialDistance(intersection, heights.y, prev, prevHeights.y);
+          prevHeights = heights;
+        }
+      }
+      prev = intersection;;
+    }
+  }
+  cout << "Sampled " << numSamples << " points." << endl;
+  return pathLengths;
+}
+
