@@ -32,4 +32,8 @@ Disabling diagnoal interpolation brings these values within 1% of each other. Th
 
 I'd also like to incorporate a visualizer, or at at least mark visited cells in the color images and export a texture for analysis, so that I can see what's happening. While I started to put together a quick prototype, it would require more time than was alotted to complete. 
 
+<img width="483" alt="image" src="https://github.com/user-attachments/assets/a35ec6c9-5717-4b83-9226-0d43a9ef9f1e" />
+
+
+
 
