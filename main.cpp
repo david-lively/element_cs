@@ -80,8 +80,6 @@ int main(int argc, char** argv)
         cout << "Before eruption: " << pathLengths.x << endl;
         cout << "After eruption: " << pathLengths.y << endl;
         cout << "Delta: " << pathLengths.y - pathLengths.x << endl;
-
-
     }
 
     cout << "Done." << endl;
