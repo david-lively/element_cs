@@ -8,6 +8,22 @@ Run.
 
 Follow the prompts to enter coordinates for the line to be measured. 
 
+## Alternate Approach
+
+As they say, hindsight is 20/20. 
+
+It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal intersections, and the diagonals.
+
+Rather than botherig with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. Then, in a loop, pick the closest non-visted intersection among the top of the three lists (or queues). Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
+
+Duh. 
+
+This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary, and the code would likely be much cleaner (and shorter). 
+
+Queue "If I could turn back time..." by Cher.  Given another 3 hours to work on this, I'd definitely follow this approach, or at least throw a test together and see how well it works, or what unexpected challenges it would present. 
+
+What follows is from my original submission. 
+
 # Known Issues
 Diagnoal calculation is off. I suspect an issue with sampling on diagonal edges. This is a solvable problem, but I wasn't able to correct the issue in the time alotted. 
 Some possibilities include accumulated floating point error, incorrect interpolation on diagonals, or some basic math assumption I made that is incorrect.
@@ -37,6 +53,8 @@ The image below illustrates the output of the modified DDA (raycast) algorithm a
 *This indicates to me that the heigh sampling interpolation logic is incorrect.*
 
 <img width="611" alt="image" src="https://github.com/user-attachments/assets/a25c955a-ae28-46e6-a61b-9ff3948e39b8" />
+
+
 
 
 
