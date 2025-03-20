@@ -19,9 +19,9 @@ It occurred to me that all of the vertical boundary intersections are equally sp
   path_length = 0;
   current = start; // intial position
 
-  vi = next_vertical_intersection();   // calculated from  startX and slope
-  hi = next_horizontal_intersection(); // from startY and slope
-  di = next_diagonal_intersection();  //  etc. 
+  vi = first_vertical_intersection();   // calculated from  startX and slope
+  hi = first_horizontal_intersection(); // from startY and slope
+  di = first_diagonal_intersection();  //  etc. 
 
   while (current in rect(start.x,start.y,end.x,end.y))
   {
@@ -30,7 +30,7 @@ It occurred to me that all of the vertical boundary intersections are equally sp
       path_length += abs(prev_height - sample(vi));
       current = vi;
       vi.x++;
-      v.y ++;
+      vi.y ++;
     }
     else if (in_bounds(hi) && hi is closest to current)
     {
