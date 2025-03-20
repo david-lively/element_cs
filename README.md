@@ -14,15 +14,49 @@ As they say, hindsight is 20/20.
 
 It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal and the diagonal intersections. (Where "intersection" indicates a point at which the height map must be sampled.) You would need an initial ray cast to find the first sample point of each of the three types (horizontal, vertical and diagonal), but after that, it's just addition. 
 
-Rather than bothering with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. These lists (or queues) could be directly generated without the need for intersection testing at all. Then, in a loop, pick the closest non-visted intersection among the top of the three queues. Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
+```
+  prev_height = sample(startPixel);
+  path_length = 0;
+
+  vi = next_vertical_intersection();
+  hi = next_horizontal_intersection();
+  di = next_diagonal_intersection();
+
+  while (current in rect(start.x,start.y,end.x,end.y))
+  {
+    if (in_bounds(di) && vi is closest to current)
+    {
+      path_length += abs(prev_height - sample(vi));
+      current = vi;
+      vi.x++;
+      v.y ++;
+    }
+    else if (in_bounds(hi) && hi is closest to current)
+    {
+      path_length += abs(prev_height - sample(hi));
+      current = hi;
+      hi.x++;
+      hi.y++;
+    } else if (in_bounds(di) { // di is closest to current position
+      path_length += abs(prev_height - sample(di));
+      current = di;
+      di.x++;
+      di.y++;
+    }
+    else
+      break; // all candidates are outside of the sample area, so we're done. 
+  }
+```
+
+Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case, of an axis-aligned ray, only one of the three possibilites will yield a valid sample position. Pick the closest point to the previous position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal), and loop until there are no valid candidates. 
 
 Duh. 
 
-This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after the first one, and the code would likely be much cleaner (and shorter). 
+This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after the first samples. This would remove a ton of complexity from the traversal code, as well as potentially simplifying the sample interpolation code. 
 
 Queue "If I could turn back time..." by Cher.  Given another 3 hours to work on this, I'd definitely follow this approach, or at least throw a test together and see how well it works, or what unexpected challenges it would present. 
 
-What follows is from my original submission. 
+## What follows is from my original submission. 
 
 # Known Issues
 Diagnoal calculation is off. I suspect an issue with sampling on diagonal edges. This is a solvable problem, but I wasn't able to correct the issue in the time alotted. 
