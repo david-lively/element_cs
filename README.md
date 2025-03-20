@@ -14,6 +14,8 @@ As they say, hindsight is 20/20.
 
 It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal and the diagonal intersections. (Where "intersection" indicates a point at which the height map must be sampled.) The initial sample positions could be calculated directly from the starting position and slope of the ray. 
 
+Some pseudocode to illustrate:
+
 ```
   prev_height = sample(startPixel);
   path_length = 0;
@@ -42,7 +44,7 @@ It occurred to me that all of the vertical boundary intersections are equally sp
       current = hi;
       hi.x++;
       hi.y++;
-    } else if (in_bounds(di) { // di is closest to current position
+    } else if (in_bounds(di)) { // di is closest to current position
       next_height = sample(di);
       path_length += abs(prev_height - next_height);
       prev_height = next_height;
