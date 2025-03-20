@@ -17,6 +17,16 @@ It occurred to me that all of the vertical boundary intersections are equally sp
 Some pseudocode to illustrate:
 
 ```
+function usePosition(v)
+{
+  next_height = sample(v);
+  path_length += abs(prev_height - next_neight);
+  prev_height = next_height;
+  ++v.x;
+  ++v.y;
+}
+
+//....
   prev_height = sample(startPixel);
   path_length = 0;
   current = start; // intial position
@@ -29,28 +39,16 @@ Some pseudocode to illustrate:
   {
     if (in_bounds(vi) && vi is closest to current)
     {
-      next_height = sample(vi);
-      path_length += abs(prev_height - sample(vi));
-      prev_height = next_height;
+      usePosition(vi);
       current = vi;
-      vi.x++;
-      vi.y ++;
     }
     else if (in_bounds(hi) && hi is closest to current)
     {
-      next_height = sample(hi);      
-      path_length += abs(prev_height - next_height);
-      next_height = prev_height;
+      usePosition(hi);
       current = hi;
-      hi.x++;
-      hi.y++;
     } else if (in_bounds(di)) { // di is closest to current position
-      next_height = sample(di);
-      path_length += abs(prev_height - next_height);
-      prev_height = next_height;
+      usePosition(di);
       current = di;
-      di.x++;
-      di.y++;
     }
     else
       break; // all candidates are outside of the sample area, so we're done. 
