@@ -14,11 +14,11 @@ As they say, hindsight is 20/20.
 
 It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal intersections, and the diagonals.
 
-Rather than botherig with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. Then, in a loop, pick the closest non-visted intersection among the top of the three lists (or queues). Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
+Rather than botherig with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. These lists (or queues) could be directly generated without the need for intersection testing at all. Then, in a loop, pick the closest non-visted intersection among the top of the three queues. Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
 
 Duh. 
 
-This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary, and the code would likely be much cleaner (and shorter). 
+This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after the first one, and the code would likely be much cleaner (and shorter). 
 
 Queue "If I could turn back time..." by Cher.  Given another 3 hours to work on this, I'd definitely follow this approach, or at least throw a test together and see how well it works, or what unexpected challenges it would present. 
 
