@@ -17,13 +17,13 @@ It occurred to me that all of the vertical boundary intersections are equally sp
 Some pseudocode to illustrate:
 
 ```
-function usePosition(v)
+function usePosition(pos)
 {
-  next_height = sample(v);
+  next_height = sample(pos);
   path_length += abs(prev_height - next_neight);
   prev_height = next_height;
-  ++v.x;
-  ++v.y;
+  ++pos.x;
+  ++pos.y;
 }
 
 //....
