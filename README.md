@@ -17,10 +17,11 @@ It occurred to me that all of the vertical boundary intersections are equally sp
 ```
   prev_height = sample(startPixel);
   path_length = 0;
+  current = start; // intial position
 
-  vi = next_vertical_intersection();
-  hi = next_horizontal_intersection();
-  di = next_diagonal_intersection();
+  vi = next_vertical_intersection();   // calculated from  startX and slope
+  hi = next_horizontal_intersection(); // from startY and slope
+  di = next_diagonal_intersection();  //  etc. 
 
   while (current in rect(start.x,start.y,end.x,end.y))
   {
@@ -52,7 +53,7 @@ Rather than bothering with the raycast, start with finding the closest horizonta
 
 Duh. 
 
-This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after the first samples. This would remove a ton of complexity from the traversal code, as well as potentially simplifying the sample interpolation code. 
+This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after initializing `di`. This would remove a ton of complexity from the traversal code, as well as potentially simplifying the sample interpolation code. 
 
 Queue "If I could turn back time..." by Cher.  Given another 3 hours to work on this, I'd definitely follow this approach, or at least throw a test together and see how well it works, or what unexpected challenges it would present. 
 
