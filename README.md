@@ -45,7 +45,7 @@ function usePosition(pos)
     else if (in_bounds(hi) && hi is closest to current)
     {
       usePosition(hi);
-      ++hi.x
+      ++hi.x;
       ++hi.y;
     } else if (in_bounds(di)) { // di is closest to current position
       usePosition(di);
