@@ -17,32 +17,38 @@ It occurred to me that all of the vertical boundary intersections are equally sp
 Some pseudocode to illustrate:
 
 ```
-function usePosition(pos)
+function inBounds(pos)
 {
-  next_height = sample(pos);
-  path_length += spatialDistance(current,prev_height,pos,next_height);
+  return start.x <= pos.x && pos.x <= end.x
+    && start.y <= pos.y && pos.y <= end.y;
+}
+
+function usePosition(nextPos)
+{
+  next_height = sample(nextPos);
+  path_length += spatialDistance(current,prev_height,nextPos,next_height);
   prev_height = next_height;
-  current = pos;
+  current = nextPos;
 }
 
 //....
   prev_height = sample(startPixel);
   path_length = 0;
-  current = start; // intial position
+  currentPos = start; // intial position
 
   vi = first_vertical_intersection();   // calculated from start.x and slope
   hi = first_horizontal_intersection(); // from start.y and slope
   di = first_diagonal_intersection();  //  etc. 
 
-  while (current in rect(start.x,start.y,end.x,end.y))
+  while (in_bounds(currentPos))
   {
-    if (in_bounds(vi) && vi is closest to current)
+    if (in_bounds(vi) && vi is closest to currentPos)
     {
       usePosition(vi);
       ++vi.x;
       ++vi.y;
     }
-    else if (in_bounds(hi) && hi is closest to current)
+    else if (in_bounds(hi) && hi is closest to currentPos)
     {
       usePosition(hi);
       ++hi.x;
@@ -53,7 +59,7 @@ function usePosition(pos)
       ++di.y;
     }
     else
-      break; // all candidates are outside of the sample area, so we're done. 
+      break; // all candidates are outside of the sample area, so we're done. This should never trigger. 
   }
   return path_length;
 ```
