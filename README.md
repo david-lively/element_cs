@@ -19,27 +19,33 @@ It occurred to me that all of the vertical boundary intersections are equally sp
   path_length = 0;
   current = start; // intial position
 
-  vi = first_vertical_intersection();   // calculated from  startX and slope
-  hi = first_horizontal_intersection(); // from startY and slope
+  vi = first_vertical_intersection();   // calculated from start.x and slope
+  hi = first_horizontal_intersection(); // from start.y and slope
   di = first_diagonal_intersection();  //  etc. 
 
   while (current in rect(start.x,start.y,end.x,end.y))
   {
-    if (in_bounds(di) && vi is closest to current)
+    if (in_bounds(vi) && vi is closest to current)
     {
+      next_height = sample(vi);
       path_length += abs(prev_height - sample(vi));
+      prev_height = next_height;
       current = vi;
       vi.x++;
       vi.y ++;
     }
     else if (in_bounds(hi) && hi is closest to current)
     {
-      path_length += abs(prev_height - sample(hi));
+      next_height = sample(hi);      
+      path_length += abs(prev_height - next_height);
+      next_height = prev_height;
       current = hi;
       hi.x++;
       hi.y++;
     } else if (in_bounds(di) { // di is closest to current position
-      path_length += abs(prev_height - sample(di));
+      next_height = sample(di);
+      path_length += abs(prev_height - next_height);
+      prev_height = next_height;
       current = di;
       di.x++;
       di.y++;
@@ -47,6 +53,7 @@ It occurred to me that all of the vertical boundary intersections are equally sp
     else
       break; // all candidates are outside of the sample area, so we're done. 
   }
+  return path_length;
 ```
 
 Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case, of an axis-aligned ray, only one of the three possibilites will yield a valid sample position. Pick the closest point to the previous position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal), and loop until there are no valid candidates. 
