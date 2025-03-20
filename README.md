@@ -14,7 +14,7 @@ As they say, hindsight is 20/20.
 
 It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal intersections, and the diagonals.
 
-Rather than botherig with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. These lists (or queues) could be directly generated without the need for intersection testing at all. Then, in a loop, pick the closest non-visted intersection among the top of the three queues. Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
+Rather than bothering with the raycast, one could just generate a list each for the horizontal intersections, vertical intersections and diagonal intersections. These lists (or queues) could be directly generated without the need for intersection testing at all. Then, in a loop, pick the closest non-visted intersection among the top of the three queues. Sample the height at that point, add the difference between that and the previous best height to the running total, and iterate until all three queues are empty. 
 
 Duh. 
 
