@@ -35,7 +35,7 @@ function usePosition(nextPos)
   prev_height = sample(startPixel);
   path_length = 0;
   currentPos = start; // intial position
-  rayNorm = normalize(Vec2(endX-startX,endY-startY));
+  rayNorm = normalize(Vec2(end.x-start.x,end.y-start.y));
 
   vi = first_vertical_intersection();   // calculated from start.x and slope
   hi = first_horizontal_intersection(); // from start.y and slope
