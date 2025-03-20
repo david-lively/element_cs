@@ -68,13 +68,13 @@ function usePosition(nextPos)
   return path_length;
 ```
 
-Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case of an axis-aligned ray, only one of the three possibilites will yield a valid sample position; the others will have `.x` or `.y` of `infinity`. Pick the closest point to the previous position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal) via simple addition, and loop until there are no valid candidates. 
+Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case of an axis-aligned ray, only one of the three possibilites will yield a valid sample position; the others will have `.x` or `.y` of `infinity`. Pick the closest of the candidate "next" points to the previous sampled position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal) via simple addition, and loop until there are no valid candidates. 
 
 Duh. 
 
 I have no doubt that this could be simplified even further. 
 
-This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No tricky diagonal intersections tests would be necessary after initializing `di`. This would remove a ton of complexity from the traversal code, as well as potentially simplifying the sample interpolation code. 
+This approach would likely give a cleaner result than the implementation in this repository. Each intersection would be calculated using integer addition rather than floating point, where small errors can accumulate over many steps. No diagonal intersections tests would be necessary after initializing `di`. This would remove a ton of complexity from the traversal code, as well as potentially simplifying the sample interpolation code. 
 
 Queue "If I could turn back time..." by Cher.  Given another 3 hours to work on this, I'd definitely follow this approach, or at least throw a test together and see how well it works, or what unexpected challenges it would present. 
 
