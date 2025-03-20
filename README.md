@@ -12,7 +12,7 @@ Follow the prompts to enter coordinates for the line to be measured.
 
 As they say, hindsight is 20/20. 
 
-It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal and the diagonal intersections. (Where "intersection" indicates a point at which the height map must be sampled.) You would need an initial ray cast to find the first sample point of each of the three types (horizontal, vertical and diagonal), but after that, it's just addition. 
+It occurred to me that all of the vertical boundary intersections are equally spaced in X and Y (based on the slope of the ray). The same goes for the horizontal and the diagonal intersections. (Where "intersection" indicates a point at which the height map must be sampled.) The initial sample positions could be calculated directly from the starting position and slope of the ray. 
 
 ```
   prev_height = sample(startPixel);
