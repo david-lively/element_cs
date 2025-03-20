@@ -66,7 +66,7 @@ function usePosition(nextPos)
       di.y += dvdY;
     }
     else
-      break; // all candidates are outside of the sample area, so we're done. This should never trigger. 
+      break; // all candidates are outside of the sample area, so we're done. 
   }
   return path_length;
 ```
