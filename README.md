@@ -20,10 +20,9 @@ Some pseudocode to illustrate:
 function usePosition(pos)
 {
   next_height = sample(pos);
-  path_length += abs(prev_height - next_neight);
+  path_length += spatialDistance(current,prev_height,pos,next_height);
   prev_height = next_height;
-  ++pos.x;
-  ++pos.y;
+  current = pos;
 }
 
 //....
@@ -40,15 +39,18 @@ function usePosition(pos)
     if (in_bounds(vi) && vi is closest to current)
     {
       usePosition(vi);
-      current = vi;
+      ++vi.x;
+      ++vi.y;
     }
     else if (in_bounds(hi) && hi is closest to current)
     {
       usePosition(hi);
-      current = hi;
+      ++hi.x
+      ++hi.y;
     } else if (in_bounds(di)) { // di is closest to current position
       usePosition(di);
-      current = di;
+      ++di.x;
+      ++di.y;
     }
     else
       break; // all candidates are outside of the sample area, so we're done. 
