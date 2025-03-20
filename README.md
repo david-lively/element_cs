@@ -58,7 +58,7 @@ function usePosition(pos)
   return path_length;
 ```
 
-Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case, of an axis-aligned ray, only one of the three possibilites will yield a valid sample position. Pick the closest point to the previous position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal), and loop until there are no valid candidates. 
+Rather than bothering with the raycast, start with finding the closest horizontal, vertical and diagonal intersection to the start position that are within the rect defined by the start and end pixel coordinates. Note that, in the case of an axis-aligned ray, only one of the three possibilites will yield a valid sample position; the others will have `.x` and `.y` of `infinity`. Pick the closest point to the previous position, sample it from the heightmap and update the running total `path_length`, get the next intersection of that category (horizontal, vertical, diagonal), and loop until there are no valid candidates. 
 
 Duh. 
 
