@@ -1,8 +1,11 @@
 # element_cs
 
-To run: clone the repo
+To run: 
 
-Build the project with cmake (or use the CLion IDE with the included project)
+Clone the repo.
+
+Build the project with cmake (or use the CLion IDE with the included project, ensuring that the working directory in the target configurion is set to $ProjectFileDir$ . 
+<img width="603" alt="image" src="https://github.com/user-attachments/assets/67cfe5ac-dcd8-45a3-825c-8ff3f974d107" />
 
 Run. 
 
