@@ -185,9 +185,6 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     float dx = distanceSquared(current,nextX);
     float dy = distanceSquared(current,nextY);
 
-    if (isnan(dx) && isnan(dy))
-      break;
-
     if (dx < dy)
     {
       next = nextX;
@@ -204,14 +201,14 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     }
 
     // diagonal check.
-    Vec2 nextD = getDiagonalIntersection(current,next);
-    if (nextD.inRect(boundsMin, boundsMax))
+    Vec2 nextDiagonal = getDiagonalIntersection(current,next);
+    if (nextDiagonal.inRect(boundsMin, boundsMax))
     {
-      float dh = sample(heightMap,nextD);
-      float dist = getSpatialDistance(current,prevHeight, nextD, dh);
+      float dh = sample(heightMap,nextDiagonal);
+      float dist = getSpatialDistance(current,prevHeight, nextDiagonal, dh);
       pathLength += dist;
       prevHeight = dh;
-      current = nextD;
+      current = nextDiagonal;
     }
 
     if (next.inRect(boundsMin, boundsMax)) {
