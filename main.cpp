@@ -86,6 +86,13 @@ int main(int argc, char** argv)
             continue;
         }
         cout << "Calculating each path separately" << endl;
+        /*
+        A more efficient approach would be to calculate path lengths from both buffers simultaneously, in a single pass, since
+        the sample locations are a function of line start and end positions, which will be the same for both height maps.    
+        For a 512x512 map, the execution time difference is negligible. For larger data sets, or if we needed to run this 
+        method many times in a loop, then it would be worthwhile to add a specialized version of the CalculatePathLength function
+        to handle both maps at once. 
+        */
         double preDistance = Analyzer::CalculatePathLength(beforeData, mapDims, start,end);
         double postDistance = Analyzer::CalculatePathLength(afterData, mapDims,start,end);
         cout << "Before eruption: " << preDistance << endl;
