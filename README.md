@@ -5,7 +5,11 @@ To run:
 * Clone the repo
 * Build the project with cmake (or use the CLion IDE with the included project)
 * Run. 
-* Follow the prompts to enter coordinates for the line to be measured. 
+* Follow the prompts to enter coordinates for the line to be measured.
+
+## Update
+For a correct version, [see the V2 branch][/david-lively/element_cs/tree/v2]. 
+
 
 ## Alternate Approach
 
