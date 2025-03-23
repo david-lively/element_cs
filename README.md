@@ -31,7 +31,7 @@ dx *= 30; // meters
 dy *= 30; 
 dh *= 11;
 
-float spatialDistance = sqrt(dx*dx + dy*dy +dz * dz);
+float spatialDistance = sqrt(dx*dx + dy*dy + dh*dh);
 
 pathLength += spatialDistance;
 prevIntersection = intersection; 
