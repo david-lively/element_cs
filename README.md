@@ -8,7 +8,7 @@ To run:
 * Follow the prompts to enter coordinates for the line to be measured.
 
 ## Update
-For a correct version, [see the V2 branch][/david-lively/element_cs/tree/v2]. 
+For a correct version, [[see the V2 branch](https://github.com/david-lively/element_cs/tree/v2)]. 
 
 
 ## Alternate Approach
