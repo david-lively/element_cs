@@ -7,28 +7,28 @@ using namespace std;
 Vec2::Vec2() : x(0), y(0) {
 }
 
-Vec2::Vec2(float _x, float _y) : x(_x), y(_y) {
+Vec2::Vec2(double _x, double _y) : x(_x), y(_y) {
 }
 
 void Vec2::normalize() {
-    float magnitude = sqrt(x * x + y * y);
+    double magnitude = sqrt(x * x + y * y);
     if (magnitude > 0) {
         x /= magnitude;
         y /= magnitude;
     }
 }
 
-float Vec2::lengthSquared() const {
+double Vec2::lengthSquared() const {
     return x * x + y * y;
 }
 
-float Vec2::length() {
+double Vec2::length() {
     return sqrt(lengthSquared());
 }
 
 bool Vec2::equals(const Vec2 &other) {
-    return abs(x - other.x) < numeric_limits<float>::epsilon() &&
-           abs(y - other.y) < numeric_limits<float>::epsilon();
+    return abs(x - other.x) < numeric_limits<double>::epsilon() &&
+           abs(y - other.y) < numeric_limits<double>::epsilon();
 }
 
 bool Vec2::inRect(const Vec2& boundsMin, const Vec2& boundsMax) {

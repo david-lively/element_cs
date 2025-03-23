@@ -1,14 +1,14 @@
 #pragma once
 
 struct Vec2 {
-    float x;
-    float y;
+    double x;
+    double y;
 
     Vec2();
-    Vec2(float _x, float _y);
+    Vec2(double _x, double _y);
     void normalize();
-    float lengthSquared() const;
-    float length();
+    double lengthSquared() const;
+    double length();
     bool equals(const Vec2 &other);
     bool inRect(const Vec2& boundsMin, const Vec2& boundsMax);
     Vec2& operator+=(const Vec2 &other);

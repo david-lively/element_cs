@@ -10,9 +10,9 @@
 #include <vector>
 #include "Analyzer.h"
 
-#define FLOAT_EPSILON numeric_limits<float>::epsilon()
-#define FLOAT_MAX numeric_limits<float>::max()
-constexpr float SQRT_2 = 1.414213562f;
+#define double_EPSILON numeric_limits<double>::epsilon()
+#define double_MAX numeric_limits<double>::max()
+constexpr double SQRT_2 = 1.414213562f;
 
 
 using namespace std;
@@ -32,32 +32,32 @@ vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
  *I'm sure there is a better way to do this.
  */
 Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
-  float left = (int) ((a.x + b.x) / 2.0f);
-  float top = (int) ((a.y + b.y) / 2.0f);
-  float cx = left + 1;
-  float cy = top;
-  float dx = left;
-  float dy = top + 1;
+  double left = (int) ((a.x + b.x) / 2.0f);
+  double top = (int) ((a.y + b.y) / 2.0f);
+  double cx = left + 1;
+  double cy = top;
+  double dx = left;
+  double dy = top + 1;
 
-  Vec2 result(FLOAT_MAX, FLOAT_MAX);
+  Vec2 result(double_MAX, double_MAX);
 
-  float a1 = b.y - a.y;
-  float b1 = a.x - b.x;
-  float c1 = a1 * a.x + b1 * a.y;
+  double a1 = b.y - a.y;
+  double b1 = a.x - b.x;
+  double c1 = a1 * a.x + b1 * a.y;
 
-  float a2 = dy - cy;
-  float b2 = cx - dx;
-  float c2 = a2 * cx + b2 * cy;
+  double a2 = dy - cy;
+  double b2 = cx - dx;
+  double c2 = a2 * cx + b2 * cy;
 
-  float det = a1 * b2 - a2 * b1;
+  double det = a1 * b2 - a2 * b1;
 
-  if (abs(det) > FLOAT_EPSILON) {
+  if (abs(det) > double_EPSILON) {
     result.x = (b2 * c1 - b1 * c2) / det;
     result.y = (a1 * c2 - a2 * c1) / det;
 
     if (result.x < left || result.x >= left + 1 || result.y < top || result.y >= top + 1) {
-      result.x = FLOAT_MAX;
-      result.y = FLOAT_MAX;
+      result.x = double_MAX;
+      result.y = double_MAX;
     }
   }
   return result;
@@ -78,13 +78,13 @@ T sign(T v) {
   return v < 0 ? -1 : 1;
 }
 
-float distanceSquared(const Vec2& a, const Vec2& b) {
-  float dx = a.x - b.x;
-  float dy = a.y - b.y;
+double distanceSquared(const Vec2& a, const Vec2& b) {
+  double dx = a.x - b.x;
+  double dy = a.y - b.y;
   return dx * dx + dy * dy;
 }
 
-float distance(const Vec2& a, const Vec2& b) {
+double distance(const Vec2& a, const Vec2& b) {
   return sqrt(distanceSquared(a, b));
 }
 
@@ -101,29 +101,34 @@ float distance(const Vec2& a, const Vec2& b) {
  * we sample the upper-right and lower-left adjacent values and lerp between them
  * based on the sample's position on the diagonal.
  */
-float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
-  int left = floor(pos.x);
-  int right = ceil(pos.x);
-  int top = floor(pos.y);
-  int bottom = ceil(pos.y);
+double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
+  double left = floor(pos.x);
+  double right = ceil(pos.x);
+  double top = floor(pos.y);
+  double bottom = ceil(pos.y);
 
-  if (abs(left - pos.x) <= FLOAT_EPSILON)
+  // these `ifs` could be consolidated and cleaned up quite a bit.
+
+  if (abs(left - pos.x) <= double_EPSILON)
     right = left;
-  else if (abs(right - pos.x) <= FLOAT_EPSILON)
+  else if (abs(right - pos.x) <= double_EPSILON)
     left = right;
-  if (abs(top - pos.y) <= FLOAT_EPSILON)
+  if (abs(top - pos.y) <= double_EPSILON)
     bottom = top;
-  else if (abs(bottom-pos.y) <= FLOAT_EPSILON)
+  else if (abs(bottom-pos.y) <= double_EPSILON)
     top = bottom;
 
-  Vec2 p0(right,top);
-  Vec2 p1(left,bottom);
-  float dist = distance(p0, p1);
-  float da = distance(pos,p0);
-  float lerpFactor = dist / da;
+  double lerpFactor = 0;
 
-  float a = SAMPLE(p0);
-  float b = SAMPLE(p1);
+  if (left != right)
+    lerpFactor = (pos.x - left) / (right - left);
+  else if (top != bottom)
+    lerpFactor = (pos.y - top) / (bottom - top);
+  else
+    lerpFactor = 0;
+
+  double a = SAMPLE(Vec2(right,top));
+  double b = SAMPLE(Vec2(left,bottom));
 
   return lerp(a,b,lerpFactor);
 }
@@ -131,13 +136,13 @@ float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims,
 /*
  * Get the "real world" distance between two points (x,y, height)
  */
-float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const float h1) {
+double getSpatialDistance(const Vec2& p0, const double h0, const Vec2& p1, const double h1) {
   /// scale to real world units.
   /// 30 meters in x and y per unit,
-  float dx = 30 * (p1.x - p0.x);
-  float dy = 30 * (p1.y - p0.y);
+  double dx = 30 * (p1.x - p0.x);
+  double dy = 30 * (p1.y - p0.y);
   /// 11 meters in height per unit.
-  float dh = 11 * (h1 - h0);
+  double dh = 11 * (h1 - h0);
   return sqrt(dx * dx + dy * dy + dh * dh);
 }
 
@@ -155,7 +160,7 @@ float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const f
  * vs running the single-path version once for each map. That may not be the case for extremely large data sets.
  */
 
-float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,const Vec2& mapDims, const Vec2& start, const Vec2& end) {
+double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,const Vec2& mapDims, const Vec2& start, const Vec2& end) {
   const Vec2 boundsMin(min(start.x,end.x),min(start.y,end.y));
   const Vec2 boundsMax (max(start.x,end.x),max(start.y,end.y));
 
@@ -170,12 +175,12 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
 
   Vec2 current = start;
   Vec2 next = current;
-  float prevHeight = heightMap[start.y * mapDims.x + (unsigned int)start.x];
-  float pathLength = 0;
+  double prevHeight = heightMap[start.y * mapDims.x + (unsigned int)start.x];
+  double pathLength = 0;
 
   do {
-    float dx = distanceSquared(current,nextX);
-    float dy = distanceSquared(current,nextY);
+    double dx = distanceSquared(current,nextX);
+    double dy = distanceSquared(current,nextY);
 
     if (dx < dy)
     {
@@ -196,16 +201,16 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     Vec2 nextDiagonal = getDiagonalIntersection(current,next);
     if (nextDiagonal.inRect(boundsMin, boundsMax))
     {
-      float dh = sample(heightMap, mapDims, nextDiagonal);
-      float dist = getSpatialDistance(current,prevHeight, nextDiagonal, dh);
+      double dh = sample(heightMap, mapDims, nextDiagonal);
+      double dist = getSpatialDistance(current,prevHeight, nextDiagonal, dh);
       pathLength += dist;
       prevHeight = dh;
       current = nextDiagonal;
     }
 
     if (next.inRect(boundsMin, boundsMax)) {
-      float nextHeight = sample(heightMap, mapDims, next);
-      float dist = getSpatialDistance(current,prevHeight,next,nextHeight);
+      double nextHeight = sample(heightMap, mapDims, next);
+      double dist = getSpatialDistance(current,prevHeight,next,nextHeight);
       pathLength += dist;
       prevHeight = nextHeight;
     }
