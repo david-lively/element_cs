@@ -28,11 +28,14 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
         cout << "error = " << error << endl;
     }
 
-    cout << "\n\n";
+    cout << "************" << endl;
 
     {
         Vec2 start(0,0);
         Vec2 end(511,0);
+
+        cout << "Horizontal test from " << start.x << "," << start.y << " to " << end.x << "," << end.y << endl;
+
         double cp0 = 0;
         double cp1 = 0;
         for (int i=start.x + 1; i <= end.x; ++i) {
@@ -42,12 +45,11 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
             cp1 += sqrt(30*30 + d1*d1);
         }
 
-        cout << " Horizontal test\n: Before: " << cp0 << " after " << cp1 << " delta " << (cp1 - cp0) << endl;
+        cout << "From simple loop: " << cp0 << " after " << cp1 << " delta " << (cp1 - cp0) << endl;
         double ap0 = Analyzer::CalculatePathLength(beforeData,mapDims,start, end);
         double ap1 = Analyzer::CalculatePathLength(afterData,mapDims,start,end);
-        cout << "Calculated:\n  Before: " << ap0 << " after " << ap1 << " delta " << ap1 - ap0 << endl;
+        cout << "From Analyzer:\n  Before: " << ap0 << " after " << ap1 << " delta " << ap1 - ap0 << endl;
 
-        cout << "Compare Horizontal test from " << start.x << "," << start.y << " to " << end.x << "," << end.y << endl;
         cout << "Before\tAfter\tDelta\n";
         cout << cp0 << "\t" << cp1 << "\t" << (cp0 - cp1) << endl;
         cout << ap0 << "\t" << ap1 << "\t" << (ap0 - ap1) << endl;

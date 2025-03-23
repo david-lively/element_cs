@@ -189,13 +189,13 @@ double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap
     }
 
     // diagonal check.
-    Vec2 nextDiagonal = getDiagonalIntersection(current, next);
-    if (nextDiagonal.inRect(boundsMin, boundsMax)) {
-      double dh = sample(heightMap, mapDims, nextDiagonal);
-      double dist = getSpatialDistance(current, prevHeight, nextDiagonal, dh);
+    Vec2 nextDiagonalIntersection = getDiagonalIntersection(current, next);
+    if (nextDiagonalIntersection.inRect(boundsMin, boundsMax)) {
+      double dh = sample(heightMap, mapDims, nextDiagonalIntersection);
+      double dist = getSpatialDistance(current, prevHeight, nextDiagonalIntersection, dh);
       pathLength += dist;
       prevHeight = dh;
-      current = nextDiagonal;
+      current = nextDiagonalIntersection;
     }
 
     if (next.inRect(boundsMin, boundsMax)) {
