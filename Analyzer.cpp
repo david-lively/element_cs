@@ -27,14 +27,6 @@ vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
   return buffer;
 }
 
-void Analyzer::Load(const Vec2& dims, const std::string& before, const std::string& after) {
-  m_beforeData = LoadHeightmap(before);
-  m_afterData = LoadHeightmap(after);
-  assert(m_beforeData.size() == m_afterData.size() && "Buffer sizes do not match");
-  assert(dims.x * dims.y == m_beforeData.size() && "Specified dimensions do not buffer");
-  m_mapDims = dims;
-}
-
 /*
  *Calculates the intersection between
  *I'm sure there is a better way to do this.
@@ -96,7 +88,7 @@ float distance(const Vec2& a, const Vec2& b) {
   return sqrt(distanceSquared(a, b));
 }
 
-#define OFFSET_OF(p) ((unsigned int)p.y * m_mapDims.x + (unsigned int)p.x)
+#define OFFSET_OF(p) ((unsigned int)p.y * mapDims.x + (unsigned int)p.x)
 #define SAMPLE(p) buffer[OFFSET_OF(p)]
 
 /*
@@ -109,7 +101,7 @@ float distance(const Vec2& a, const Vec2& b) {
  * we sample the upper-right and lower-left adjacent values and lerp between them
  * based on the sample's position on the diagonal.
  */
-float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& pos) {
+float Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
   int left = floor(pos.x);
   int right = ceil(pos.x);
   int top = floor(pos.y);
@@ -160,25 +152,25 @@ float getSpatialDistance(const Vec2& p0, const float h0, const Vec2& p1, const f
  *
  * While it's more efficient to do both the old and new heightmaps at once since all of the
  * sample positions are identical, in practice, this doesn't provide a noticeable perf benefit
- * vs running the single-path version once for each map.
+ * vs running the single-path version once for each map. That may not be the case for extremely large data sets.
  */
 
-float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& start, const Vec2& end) {
-  Vec2 boundsMin(min(start.x,end.x),min(start.y,end.y));
-  Vec2 boundsMax (max(start.x,end.x),max(start.y,end.y));
+float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,const Vec2& mapDims, const Vec2& start, const Vec2& end) {
+  const Vec2 boundsMin(min(start.x,end.x),min(start.y,end.y));
+  const Vec2 boundsMax (max(start.x,end.x),max(start.y,end.y));
 
-  Vec2 current = start;
   Vec2 rayDir(end.x - start.x, end.y - start.y);
   rayDir.normalize();
 
-  Vec2 xStep(sign(rayDir.x), abs(rayDir.y / rayDir.x) * sign(rayDir.y));
-  Vec2 nextX(current.x + xStep.x, current.y + xStep.y);
+  const Vec2 xStep(sign(rayDir.x), abs(rayDir.y / rayDir.x) * sign(rayDir.y));
+  Vec2 nextX(start.x + xStep.x, start.y + xStep.y);
 
-  Vec2 yStep(abs(rayDir.x / rayDir.y) * sign(rayDir.x), sign(rayDir.y));
-  Vec2 nextY(current.x + yStep.x, current.y + yStep.y);
+  const Vec2 yStep(abs(rayDir.x / rayDir.y) * sign(rayDir.x), sign(rayDir.y));
+  Vec2 nextY(start.x + yStep.x, start.y + yStep.y);
 
+  Vec2 current = start;
   Vec2 next = current;
-  float prevHeight = heightMap[start.y * m_mapDims.x + (unsigned int)start.x];
+  float prevHeight = heightMap[start.y * mapDims.x + (unsigned int)start.x];
   float pathLength = 0;
 
   do {
@@ -188,23 +180,23 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     if (dx < dy)
     {
       next = nextX;
-      nextX.add(xStep);
+      nextX += xStep;
     } else if (dx > dy)
     {
       next = nextY;
-      nextY.add(yStep);
+      nextY += yStep;
     } else
     {
       next = nextX;
-      nextX.add(xStep);
-      nextY.add(yStep);
+      nextX += xStep;
+      nextY += yStep;
     }
 
     // diagonal check.
     Vec2 nextDiagonal = getDiagonalIntersection(current,next);
     if (nextDiagonal.inRect(boundsMin, boundsMax))
     {
-      float dh = sample(heightMap,nextDiagonal);
+      float dh = sample(heightMap, mapDims, nextDiagonal);
       float dist = getSpatialDistance(current,prevHeight, nextDiagonal, dh);
       pathLength += dist;
       prevHeight = dh;
@@ -212,14 +204,13 @@ float Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,
     }
 
     if (next.inRect(boundsMin, boundsMax)) {
-      float nextHeight = sample(heightMap, next);
+      float nextHeight = sample(heightMap, mapDims, next);
       float dist = getSpatialDistance(current,prevHeight,next,nextHeight);
       pathLength += dist;
       prevHeight = nextHeight;
     }
     current = next;
   } while (current.inRect(boundsMin,boundsMax));
-
 
   return pathLength;
 }

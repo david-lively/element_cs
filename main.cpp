@@ -8,17 +8,18 @@ bool inRange(const Vec2& vec, float mn, float mx) {
     return vec.x >= mn && vec.x <= mx && vec.y >= mn && vec.y <= mx;
 }
 
-void runTests(Analyzer& analyzer) {
-    // vector<vector<Vec2>> testData
-    // {
-    //     { {0,0}, {255,0}, {511,0} },
-    // };
-    //
-    // for (auto& test : testData) {
-    //
-    //     analyzer.CalculatePathLength(analyzer.beforeData())
-    //
-    // }
+void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, const vector<unsigned char>& afterData) {
+    Vec2 p0(0,0);
+    Vec2 p1(255,255);
+    Vec2 p2(512,512);
+
+    float d01 = Analyzer::CalculatePathLength(beforeData, mapDims, p0,p1);
+    float d12 = Analyzer::CalculatePathLength(beforeData, mapDims, p1,p2);
+    float d02 = Analyzer::CalculatePathLength(beforeData,mapDims,p2,p0);
+
+    cout << "d01 = " << d01 << " d12 = " << d12 << " d02 = " << d02 << endl;
+    float delta = (d02 - (d01 + d12));
+    cout << "delta = " << delta << endl;
 }
 
 int main(int argc, char** argv)
@@ -28,14 +29,15 @@ int main(int argc, char** argv)
     Analyzer analyzer;
     Vec2 mapDims(512,512);
     cout << "Loading maps...";
-    analyzer.Load(mapDims,"data/st-helens/pre.data","data/st-helens/post.data");
+    auto beforeData = Analyzer::LoadHeightmap("data/st-helens/pre.data");
+    auto afterData = Analyzer::LoadHeightmap("data/st-helens/post.data");
     cout << "Done." << endl;
-    // runTests(analyzer);
+    runTests(mapDims, beforeData, afterData);
 
     Vec2 start;
     Vec2 end;
-    cout << "Enter four integer values in x0 y0 x1 y1 order. Ctrl+C or -1 to exit." << endl;
-    while (start.x != -1) {
+    cout << "Enter four integer values in x0 y0 x1 y1 order. Ctrl+C to exit." << endl;
+    while (true) {
         cout << ">";
         cin >> start.x;// >> start.y >> end.x >> end.y;
 
@@ -50,8 +52,8 @@ int main(int argc, char** argv)
             continue;
         }
         cout << "Calculating each path separately" << endl;
-        float preDistance = analyzer.CalculatePathLength(analyzer.beforeData(),start,end);
-        float postDistance = analyzer.CalculatePathLength(analyzer.afterData(),start,end);
+        float preDistance = Analyzer::CalculatePathLength(beforeData, mapDims, start,end);
+        float postDistance = Analyzer::CalculatePathLength(afterData, mapDims,start,end);
         cout << "Before eruption: " << preDistance << endl;
         cout << "After eruption: " << postDistance << endl;
         cout << "Delta: " << postDistance - preDistance << endl;

@@ -31,12 +31,19 @@ bool Vec2::equals(const Vec2 &other) {
            abs(y - other.y) < numeric_limits<float>::epsilon();
 }
 
-void Vec2::add(const Vec2 &other) {
-    x += other.x;
-    y += other.y;
-}
-
 bool Vec2::inRect(const Vec2& boundsMin, const Vec2& boundsMax) {
     return boundsMin.x <= x && x <= boundsMax.x && boundsMin.y <= y && y <= boundsMax.y;
 }
+
+Vec2& Vec2::operator+=(const Vec2 &other) {
+    x += other.x;
+    y += other.y;
+    return *this;
+}
+
+Vec2 operator+(const Vec2 &a, const Vec2 &b) {
+    return Vec2(a.x + b.x, a.y + b.y);
+}
+
+
 
