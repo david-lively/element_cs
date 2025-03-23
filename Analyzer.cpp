@@ -1,19 +1,11 @@
-//
-// Created by David Lively on 3/17/25.
-//
-
 #include <fstream>
 #include <iostream>
 #include <assert.h>
-#include <iterator>
-
 #include <vector>
 #include "Analyzer.h"
 
-#define double_EPSILON numeric_limits<double>::epsilon()
-#define double_MAX numeric_limits<double>::max()
-constexpr double SQRT_2 = 1.414213562f;
-
+#define DOUBLE_EPSION numeric_limits<double>::epsilon()
+#define DOUBLE_INF numeric_limits<double>::infinity()
 
 using namespace std;
 
@@ -28,18 +20,18 @@ vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
 }
 
 /*
- *Calculates the intersection between
+ *Calculates the intersection between a ray and the "/" diagonal in a unit cell.
  *I'm sure there is a better way to do this.
  */
 Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
-  double left = (int) ((a.x + b.x) / 2.0f);
-  double top = (int) ((a.y + b.y) / 2.0f);
+  double left = (int) ((a.x + b.x) * 0.5);
+  double top = (int) ((a.y + b.y) * 0.5);
   double cx = left + 1;
   double cy = top;
   double dx = left;
   double dy = top + 1;
 
-  Vec2 result(double_MAX, double_MAX);
+  Vec2 result(DOUBLE_INF, DOUBLE_INF);
 
   double a1 = b.y - a.y;
   double b1 = a.x - b.x;
@@ -49,15 +41,16 @@ Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
   double b2 = cx - dx;
   double c2 = a2 * cx + b2 * cy;
 
-  double det = a1 * b2 - a2 * b1;
+  double oneOverDet = 1.0 / (a1 * b2 - a2 * b1);
 
-  if (abs(det) > double_EPSILON) {
-    result.x = (b2 * c1 - b1 * c2) / det;
-    result.y = (a1 * c2 - a2 * c1) / det;
+  if (abs(oneOverDet) > DOUBLE_EPSION) {
+    result.x = (b2 * c1 - b1 * c2) * oneOverDet;
+    result.y = (a1 * c2 - a2 * c1) * oneOverDet;
 
     if (result.x < left || result.x >= left + 1 || result.y < top || result.y >= top + 1) {
-      result.x = double_MAX;
-      result.y = double_MAX;
+      result.x = DOUBLE_INF;
+      result.y = DOUBLE_INF
+      ;
     }
   }
   return result;
@@ -93,8 +86,8 @@ double distance(const Vec2& a, const Vec2& b) {
 
 /*
  * Read an interpolated sample from the given buffer.
- * Sample positions lying on an integer X will be interpolated between their
- * left and right neighbors.
+ * Sample positions lying on an integer X will be interpolated between their neighbors on
+ * the edge where the intersection lies.
  * Those on an integer Y will be interpolated from their upper and lower neighbors.
  * If the point is exactly on a pixel (within epsilon), no interpolation is performed.
  * For sample positions within a cell, we assume it is on a diagonal edge. In that case,
@@ -107,15 +100,15 @@ double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims
   double top = floor(pos.y);
   double bottom = ceil(pos.y);
 
-  // these `ifs` could be consolidated and cleaned up quite a bit.
+  // these `if`s could be consolidated and cleaned up quite a bit.
 
-  if (abs(left - pos.x) <= double_EPSILON)
+  if (abs(left - pos.x) <= DOUBLE_EPSION)
     right = left;
-  else if (abs(right - pos.x) <= double_EPSILON)
+  else if (abs(right - pos.x) <= DOUBLE_EPSION)
     left = right;
-  if (abs(top - pos.y) <= double_EPSILON)
+  if (abs(top - pos.y) <= DOUBLE_EPSION)
     bottom = top;
-  else if (abs(bottom-pos.y) <= double_EPSILON)
+  else if (abs(bottom - pos.y) <= DOUBLE_EPSION)
     top = bottom;
 
   double lerpFactor = 0;
@@ -130,7 +123,7 @@ double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims
   double a = SAMPLE(Vec2(right,top));
   double b = SAMPLE(Vec2(left,bottom));
 
-  return lerp(a,b,lerpFactor);
+  return lerp(a, b, lerpFactor);
 }
 
 /*
@@ -160,9 +153,10 @@ double getSpatialDistance(const Vec2& p0, const double h0, const Vec2& p1, const
  * vs running the single-path version once for each map. That may not be the case for extremely large data sets.
  */
 
-double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap,const Vec2& mapDims, const Vec2& start, const Vec2& end) {
-  const Vec2 boundsMin(min(start.x,end.x),min(start.y,end.y));
-  const Vec2 boundsMax (max(start.x,end.x),max(start.y,end.y));
+double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& mapDims,
+                                     const Vec2& start, const Vec2& end) {
+  const Vec2 boundsMin(min(start.x, end.x), min(start.y, end.y));
+  const Vec2 boundsMax(max(start.x, end.x), max(start.y, end.y));
 
   Vec2 rayDir(end.x - start.x, end.y - start.y);
   rayDir.normalize();
@@ -175,34 +169,30 @@ double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap
 
   Vec2 current = start;
   Vec2 next = current;
-  double prevHeight = heightMap[start.y * mapDims.x + (unsigned int)start.x];
+  double prevHeight = heightMap[start.y * mapDims.x + (unsigned int) start.x];
   double pathLength = 0;
 
   do {
-    double dx = distanceSquared(current,nextX);
-    double dy = distanceSquared(current,nextY);
+    double dx = distanceSquared(current, nextX);
+    double dy = distanceSquared(current, nextY);
 
-    if (dx < dy)
-    {
+    if (dx < dy) {
       next = nextX;
       nextX += xStep;
-    } else if (dx > dy)
-    {
+    } else if (dx > dy) {
       next = nextY;
       nextY += yStep;
-    } else
-    {
+    } else {
       next = nextX;
       nextX += xStep;
       nextY += yStep;
     }
 
     // diagonal check.
-    Vec2 nextDiagonal = getDiagonalIntersection(current,next);
-    if (nextDiagonal.inRect(boundsMin, boundsMax))
-    {
+    Vec2 nextDiagonal = getDiagonalIntersection(current, next);
+    if (nextDiagonal.inRect(boundsMin, boundsMax)) {
       double dh = sample(heightMap, mapDims, nextDiagonal);
-      double dist = getSpatialDistance(current,prevHeight, nextDiagonal, dh);
+      double dist = getSpatialDistance(current, prevHeight, nextDiagonal, dh);
       pathLength += dist;
       prevHeight = dh;
       current = nextDiagonal;
@@ -210,12 +200,12 @@ double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap
 
     if (next.inRect(boundsMin, boundsMax)) {
       double nextHeight = sample(heightMap, mapDims, next);
-      double dist = getSpatialDistance(current,prevHeight,next,nextHeight);
+      double dist = getSpatialDistance(current, prevHeight, next, nextHeight);
       pathLength += dist;
       prevHeight = nextHeight;
     }
     current = next;
-  } while (current.inRect(boundsMin,boundsMax));
+  } while (current.inRect(boundsMin, boundsMax));
 
   return pathLength;
 }
