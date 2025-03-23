@@ -9,35 +9,16 @@ bool inRange(const Vec2& vec, float mn, float mx) {
 }
 
 void runTests(Analyzer& analyzer) {
-    auto& before = analyzer.beforeData();
-    before.resize(512*512);
-    auto& after = analyzer.afterData();
-    after.resize(512*512);
-
-    for (int i = 0; i < 512*512; i++) {
-        int x = i % 512;
-        if (x < 256)
-            before[i] = x;
-        else
-            before[i] = 511 - x;
-
-        after[i] = 0;
-    }
-
-    float dx = (511 * 30);
-    float dh = 11 * 512;
-
-    float expectedPre = sqrt(dx*dx + dh*dh);
-    cout << "Expected pre " << expectedPre << endl;
-    float actual = analyzer.CalculatePathLength(before, Vec2(0,0),Vec2(511,0));
-    cout << "Actual " << actual << endl << endl;
-
-    dx = sqrt(2 * 512 * 512) * 30;
-    dh = 11 * dx / 30;
-    expectedPre = sqrt(dx*dx + dh*dh);
-    cout << "Expected pre " << expectedPre << endl;
-    actual = analyzer.CalculatePathLength(before, Vec2(0,0),Vec2(511,511));
-    cout << "Actual " << actual << endl << endl;
+    // vector<vector<Vec2>> testData
+    // {
+    //     { {0,0}, {255,0}, {511,0} },
+    // };
+    //
+    // for (auto& test : testData) {
+    //
+    //     analyzer.CalculatePathLength(analyzer.beforeData())
+    //
+    // }
 }
 
 int main(int argc, char** argv)
@@ -74,12 +55,6 @@ int main(int argc, char** argv)
         cout << "Before eruption: " << preDistance << endl;
         cout << "After eruption: " << postDistance << endl;
         cout << "Delta: " << postDistance - preDistance << endl;
-
-        cout << "Calculating both at once." << endl;
-        Vec2 pathLengths = analyzer.CalculatePathLengths(start, end);
-        cout << "Before eruption: " << pathLengths.x << endl;
-        cout << "After eruption: " << pathLengths.y << endl;
-        cout << "Delta: " << pathLengths.y - pathLengths.x << endl;
     }
 
     cout << "Done." << endl;

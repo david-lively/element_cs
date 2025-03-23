@@ -30,3 +30,13 @@ bool Vec2::equals(const Vec2 &other) {
     return abs(x - other.x) < numeric_limits<float>::epsilon() &&
            abs(y - other.y) < numeric_limits<float>::epsilon();
 }
+
+void Vec2::add(const Vec2 &other) {
+    x += other.x;
+    y += other.y;
+}
+
+bool Vec2::inRect(const Vec2& boundsMin, const Vec2& boundsMax) {
+    return boundsMin.x <= x && x <= boundsMax.x && boundsMin.y <= y && y <= boundsMax.y;
+}
+
