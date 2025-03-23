@@ -34,7 +34,8 @@ void Analyzer::Load(const Vec2& dims, const std::string& before, const std::stri
 }
 
 /*
- *Calculates the intersection between two line segments a and b.
+ *Calculates the intersection between a line segment (a,b) with the diagonal of the unit cell
+ *that it crosses. 
  *I'm sure there is a better way to do this.
  */
 Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
