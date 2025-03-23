@@ -41,9 +41,12 @@ prevHeight = height;
 
 This illustration shows the intersection points (circles) and the edges that are sampled to interpolate the height at that position. 
 
+
+
 <img width="515" alt="image" src="https://github.com/user-attachments/assets/a1ccd04f-6ee1-4124-95b7-cf1274acc7ab" />
 
-
+# Know Issues
+There is a small delta (< 30 meters) when calculating the diagonal from positions `0,0` to `511,511`. I suspect this is an off-by-one error. But, I've already invested more time in this than was technically allowed. It just bugs me when things don't work as they should, so I thought I'd put some more time into it. 
 Everything else in the project comes down to map loading, Vec2 data type, DDA raycast, etc. 
 
 
