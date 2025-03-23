@@ -47,10 +47,10 @@ Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
     result.x = (b2 * c1 - b1 * c2) * oneOverDet;
     result.y = (a1 * c2 - a2 * c1) * oneOverDet;
 
+    // if the intersection is outside of the quad...
     if (result.x < left || result.x >= left + 1 || result.y < top || result.y >= top + 1) {
       result.x = DOUBLE_INF;
-      result.y = DOUBLE_INF
-      ;
+      result.y = DOUBLE_INF;
     }
   }
   return result;
