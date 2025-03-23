@@ -10,4 +10,6 @@ struct Vec2 {
     float lengthSquared() const;
     float length();
     bool equals(const Vec2 &other);
+    bool inRect(const Vec2& boundsMin, const Vec2& boundsMax);
+    Vec2& operator+=(const Vec2 &other);
 };
