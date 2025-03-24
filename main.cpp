@@ -32,8 +32,10 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
         const char* formatStr = "Dist\t %.2f, %.2f\t - \t%.2f, %.2f = \t\t%.2f\n";
         double d01 = Analyzer::CalculatePathLength(testData, mapDims, p0,p1);
         printf(formatStr, p0.x, p0.y, p1.x, p1.y, d01);
+
         double d12 = Analyzer::CalculatePathLength(testData, mapDims, p1,p2);
         printf(formatStr, p1.x, p1.y, p2.x, p2.y, d12);
+
         double d02 = Analyzer::CalculatePathLength(testData,mapDims,p0,p2);
         printf(formatStr, p0.x, p0.y, p2.x, p2.y, d02);
 
@@ -50,7 +52,8 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
 
         double cp0 = 0;
         double cp1 = 0;
-        for (int i=start.x + 1; i <= end.x; ++i) {
+
+        for (double i=start.x + 1; i <= end.x; ++i) {
             double d0 = 11.0f * abs(beforeData[i] - beforeData[i-1]);
             cp0 += sqrt(30*30+d0*d0);
             double d1 = 11.0f * abs(afterData[i] - afterData[i-1]);
@@ -58,6 +61,7 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
         }
 
         cout << "From simple loop: " << cp0 << " after " << cp1 << " delta " << (cp1 - cp0) << endl;
+
         double ap0 = Analyzer::CalculatePathLength(beforeData,mapDims,start, end);
         double ap1 = Analyzer::CalculatePathLength(afterData,mapDims,start,end);
         cout << "From Analyzer:\n  Before: " << ap0 << " after " << ap1 << " delta " << ap1 - ap0 << endl;
@@ -95,6 +99,7 @@ int main(int argc, char** argv)
             break;
 
         cin >> start.y >> end.x >> end.y;
+        cin.clear();
 
         cout << "Parsed coordinates" << endl << start.x << "," << start.y << endl << end.x << "," << end.y << endl;
         if (!inRange(start,0,511) || !inRange(end,0,511)) {
