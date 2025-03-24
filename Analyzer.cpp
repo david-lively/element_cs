@@ -122,8 +122,8 @@ double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims
     lerpFactor = (bottom - pos.y) / (bottom - top);
   }
 
-  double a = SAMPLE(Vec2(right,top));
-  double b = SAMPLE(Vec2(left,bottom));
+  double a = SAMPLE(Vec2(left,bottom));
+  double b = SAMPLE(Vec2(right,top));
 
   double result = lerp(a, b, lerpFactor);
   DebugSample::record(DebugSample{pos, Vec2(right, top), Vec2(left, bottom), lerpFactor, a, b, result});
