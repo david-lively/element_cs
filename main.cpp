@@ -9,32 +9,44 @@ bool inRange(const Vec2& vec, double mn, double mx) {
 }
 
 void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, const vector<unsigned char>& afterData) {
+    const vector<unsigned char> zeros(mapDims.x * mapDims.y, 0);
+    auto& testData = zeros;
+    //auto& testData = beforeData;
 
+    cout << "START TEST RUN" << endl;
+
+    vector<vector<Vec2>> sdTests
     {
-        cout << "Split diagonal test" << endl;
-        Vec2 p0(0,0);
-        Vec2 p1(255,255);
-        Vec2 p2(511,511);
-        cout << "P0 " << p0.x << "," << p0.y << endl;
-        cout << "P1 " << p1.x << "," << p1.y << endl;
-        cout << "P2 " << p2.x << "," << p2.y << endl;
+        { Vec2(0,0), Vec2{255,255}, Vec2(511,511) },
+        { Vec2(0,0), Vec2(255,63), Vec2(510,126) },
+        { Vec2 (0,0), Vec2(255,0), Vec2(511,0) }
+    };
 
-        double d01 = Analyzer::CalculatePathLength(beforeData, mapDims, p0,p1);
-        double d12 = Analyzer::CalculatePathLength(beforeData, mapDims, p1,p2);
-        double d02 = Analyzer::CalculatePathLength(beforeData,mapDims,p2,p0);
+    cout << "Split diagonal tests" << endl;
+    for (auto& v : sdTests)
+    {
+        Vec2& p0 = v[0];
+        Vec2& p1 = v[1];
+        Vec2& p2 = v[2];
 
-        cout << "d01 = " << d01 << " d12 = " << d12 << " d02 = " << d02 << endl;
+        const char* formatStr = "Dist\t %.2f, %.2f\t - \t%.2f, %.2f = \t\t%.2f\n";
+        double d01 = Analyzer::CalculatePathLength(testData, mapDims, p0,p1);
+        printf(formatStr, p0.x, p0.y, p1.x, p1.y, d01);
+        double d12 = Analyzer::CalculatePathLength(testData, mapDims, p1,p2);
+        printf(formatStr, p1.x, p1.y, p2.x, p2.y, d12);
+        double d02 = Analyzer::CalculatePathLength(testData,mapDims,p0,p2);
+        printf(formatStr, p0.x, p0.y, p2.x, p2.y, d02);
+
         double error = d02 - d01 - d12;
-        cout << "error = " << error << endl;
+        printf("error = %.4f\n\n",error);
     }
 
     cout << "************" << endl;
-
     {
         Vec2 start(0,0);
         Vec2 end(511,0);
 
-        cout << "Horizontal test from " << start.x << "," << start.y << " to " << end.x << "," << end.y << endl;
+        printf("Horizontal test from %.2f, %.2f to %.2f, %.2f\n", start.x, start.y, end.x, end.y);
 
         double cp0 = 0;
         double cp1 = 0;
@@ -56,6 +68,8 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
         cout << "-----------------------------------------------------" << endl;
         cout << (cp0 - ap0) << "\t" << (cp1 - ap1) << "\t" << (cp1 - cp0) - (ap1 - ap0) << endl;
     }
+
+    cout << "END TEST RUN" << endl << endl << endl;
 }
 
 int main(int argc, char** argv)

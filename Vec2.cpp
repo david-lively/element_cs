@@ -12,7 +12,7 @@ Vec2::Vec2(double _x, double _y) : x(_x), y(_y) {
 
 void Vec2::normalize() {
     double magnitude = sqrt(x * x + y * y);
-    if (magnitude > 0) {
+    if (abs(magnitude) >= numeric_limits<double>::epsilon()) {
         x /= magnitude;
         y /= magnitude;
     }

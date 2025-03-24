@@ -94,36 +94,39 @@ double distance(const Vec2& a, const Vec2& b) {
  * we sample the upper-right and lower-left adjacent values and lerp between them
  * based on the sample's position on the diagonal.
  */
-double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
+double Analyzer::sample( const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
   double left = floor(pos.x);
   double right = ceil(pos.x);
   double top = floor(pos.y);
   double bottom = ceil(pos.y);
 
+  // samplePositions.push_back(pos);
   // these `if`s could be consolidated and cleaned up quite a bit.
 
   if (abs(left - pos.x) <= DOUBLE_EPSION)
     right = left;
   else if (abs(right - pos.x) <= DOUBLE_EPSION)
     left = right;
-  if (abs(top - pos.y) <= DOUBLE_EPSION)
+  if (abs(pos.y - top) <= DOUBLE_EPSION)
     bottom = top;
   else if (abs(bottom - pos.y) <= DOUBLE_EPSION)
     top = bottom;
 
   double lerpFactor = 0;
 
-  if (left != right)
+  if (left != right) {
     lerpFactor = (pos.x - left) / (right - left);
-  else if (top != bottom)
-    lerpFactor = (pos.y - top) / (bottom - top);
-  else
-    lerpFactor = 0;
+  } else if (top != bottom) {
+    lerpFactor = (bottom - pos.y) / (bottom - top);
+  }
 
   double a = SAMPLE(Vec2(right,top));
   double b = SAMPLE(Vec2(left,bottom));
 
-  return lerp(a, b, lerpFactor);
+  double result = lerp(a, b, lerpFactor);
+  // cout << a << " " << b << " " << result << endl;
+
+  return result;
 }
 
 /*
@@ -152,7 +155,6 @@ double getSpatialDistance(const Vec2& p0, const double h0, const Vec2& p1, const
  * sample positions are identical, in practice, this doesn't provide a noticeable perf benefit
  * vs running the single-path version once for each map. That may not be the case for extremely large data sets.
  */
-
 double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& mapDims,
                                      const Vec2& start, const Vec2& end) {
   const Vec2 boundsMin(min(start.x, end.x), min(start.y, end.y));
@@ -169,7 +171,7 @@ double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap
 
   Vec2 current = start;
   Vec2 next = current;
-  double prevHeight = heightMap[start.y * mapDims.x + (unsigned int) start.x];
+  double prevHeight = sample(heightMap, mapDims, current);
   double pathLength = 0;
 
   do {
