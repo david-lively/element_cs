@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -8,10 +9,12 @@ bool inRange(const Vec2& vec, double mn, double mx) {
     return vec.x >= mn && vec.x <= mx && vec.y >= mn && vec.y <= mx;
 }
 
+vector<Sample> g_samples;
+
 void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, const vector<unsigned char>& afterData) {
     const vector<unsigned char> zeros(mapDims.x * mapDims.y, 0);
-    auto& testData = zeros;
-    //auto& testData = beforeData;
+    // auto& testData = zeros;
+    auto& testData = beforeData;
 
     cout << "START TEST RUN" << endl;
 
@@ -25,6 +28,7 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
     cout << "Split diagonal tests" << endl;
     for (auto& v : sdTests)
     {
+        g_samples.clear();
         Vec2& p0 = v[0];
         Vec2& p1 = v[1];
         Vec2& p2 = v[2];
@@ -35,12 +39,42 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
 
         double d12 = Analyzer::CalculatePathLength(testData, mapDims, p1,p2);
         printf(formatStr, p1.x, p1.y, p2.x, p2.y, d12);
+        vector<Sample> splitSamples = g_samples;
+        g_samples.clear();
 
         double d02 = Analyzer::CalculatePathLength(testData,mapDims,p0,p2);
         printf(formatStr, p0.x, p0.y, p2.x, p2.y, d02);
 
+
         double error = d02 - d01 - d12;
-        printf("error = %.4f\n\n",error);
+        printf("error = %.4f\n",error);
+
+        if (abs(error) >= 1) { //numeric_limits<double>::epsilon()) {
+            // perform a diff between the two Sample collections and figure out where we went astray
+            printf("Counts: split %lu single %lu\n",splitSamples.size(), g_samples.size());
+            const string filename = "samples.csv";
+            ofstream out(filename);
+            if (!out.is_open()) {
+                cerr << "Could not open file " << filename << endl;
+                exit(1);
+            }
+
+            splitSamples[0].print(out,true);
+            out << ",";
+            splitSamples[1].print(out,true);
+            out << endl;
+
+            for (int i=0; i < splitSamples.size(); i++) {
+                auto& l = splitSamples[i];
+                l.print(out);
+                auto& r = g_samples[i];
+                r.print(out);
+                out << endl;
+            }
+
+            out.close();
+            printf("Data written to `%s`\n\n",filename.c_str());
+        }
     }
 
     cout << "************" << endl;
@@ -76,6 +110,7 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
     cout << "END TEST RUN" << endl << endl << endl;
 }
 
+
 int main(int argc, char** argv)
 {
     cout << "Starting up." << endl;
@@ -101,7 +136,7 @@ int main(int argc, char** argv)
         cin >> start.y >> end.x >> end.y;
         cin.clear();
 
-        cout << "Parsed coordinates" << endl << start.x << "," << start.y << endl << end.x << "," << end.y << endl;
+        printf("Parsed coordinates (%.2f, %2.f) (%.2f, %.2f)\n", start.x, start.y, end.x, end.y);
         if (!inRange(start,0,511) || !inRange(end,0,511)) {
             cout << "Invalid coordinates. Use values between 0,0 and " << mapDims.x-1 << "," << mapDims.y-1 << endl;
             continue;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 struct Vec2 {
     double x;
     double y;

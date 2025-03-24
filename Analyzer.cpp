@@ -9,6 +9,19 @@
 
 using namespace std;
 
+void Sample::print(std::ostream& file, bool headerRow) {
+  if (headerRow) {
+    file << "pos.x,pos.y,posA.x,posA.y,posB.x,posB.y,lerp,value";
+  }
+  else {
+    file << pos.x << "," << pos.y << ","
+        << posA.x << "," << posA.y << ","
+        << posB.x << "," << posB.y << ","
+        << lerp << "," << val;
+  }
+
+}
+
 vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
   ifstream input(path, ios::binary);
   if (input.fail()) {
@@ -84,6 +97,8 @@ double distance(const Vec2& a, const Vec2& b) {
 #define OFFSET_OF(p) ((unsigned int)p.y * mapDims.x + (unsigned int)p.x)
 #define SAMPLE(p) buffer[OFFSET_OF(p)]
 
+extern std::vector<Sample> g_samples;
+
 /*
  * Read an interpolated sample from the given buffer.
  * Sample positions lying on an integer X will be interpolated between their neighbors on
@@ -120,8 +135,11 @@ double Analyzer::sample( const vector<unsigned char>& buffer, const Vec2& mapDim
     lerpFactor = (bottom - pos.y) / (bottom - top);
   }
 
+
   double a = SAMPLE(Vec2(right,top));
   double b = SAMPLE(Vec2(left,bottom));
+
+  g_samples.push_back(Sample { pos, Vec2(right,top), Vec2(left,bottom), lerpFactor});
 
   double result = lerp(a, b, lerpFactor);
   // cout << a << " " << b << " " << result << endl;

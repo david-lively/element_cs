@@ -2,7 +2,18 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include "Vec2.h"
+
+struct Sample {
+  Vec2 pos;
+  Vec2 posA;
+  Vec2 posB;
+  double lerp;
+  double val;
+
+  void print(std::ostream& file, bool headerRow = false);
+};
 
 class Analyzer {
 private:
