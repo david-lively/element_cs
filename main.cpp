@@ -48,7 +48,8 @@ void runTests(const Vec2& mapDims, const vector<unsigned char>& beforeData, cons
 
         double error = d02 - d01 - d12;
         printf("error = %.4f\n", error);
-        if (abs(error) >= 1) {
+        const bool forceGenerateCSV = false;
+        if (abs(error) >= 1 || forceGenerateCSV) {
             //numeric_limits<double>::epsilon()) {
             // Write samples for both runs (split and combined) to a CSV for further analysis.
             printf("Counts: split %lu single %lu\n", splitSamples.size(), g_debugSamples.size());
