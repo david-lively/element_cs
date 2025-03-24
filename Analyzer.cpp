@@ -3,24 +3,12 @@
 #include <assert.h>
 #include <vector>
 #include "Analyzer.h"
+#include "DebugSample.h"
 
-#define DOUBLE_EPSION numeric_limits<double>::epsilon()
+#define DOUBLE_EPSILON numeric_limits<double>::epsilon()
 #define DOUBLE_INF numeric_limits<double>::infinity()
 
 using namespace std;
-
-void Sample::print(std::ostream& file, bool headerRow) {
-  if (headerRow) {
-    file << "pos.x,pos.y,posA.x,posA.y,posB.x,posB.y,lerp,value";
-  }
-  else {
-    file << pos.x << "," << pos.y << ","
-        << posA.x << "," << posA.y << ","
-        << posB.x << "," << posB.y << ","
-        << lerp << "," << val;
-  }
-
-}
 
 vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
   ifstream input(path, ios::binary);
@@ -56,7 +44,7 @@ Vec2 Analyzer::getDiagonalIntersection(const Vec2& a, const Vec2& b) {
 
   double oneOverDet = 1.0 / (a1 * b2 - a2 * b1);
 
-  if (abs(oneOverDet) > DOUBLE_EPSION) {
+  if (abs(oneOverDet) > DOUBLE_EPSILON) {
     result.x = (b2 * c1 - b1 * c2) * oneOverDet;
     result.y = (a1 * c2 - a2 * c1) * oneOverDet;
 
@@ -97,7 +85,6 @@ double distance(const Vec2& a, const Vec2& b) {
 #define OFFSET_OF(p) ((unsigned int)p.y * mapDims.x + (unsigned int)p.x)
 #define SAMPLE(p) buffer[OFFSET_OF(p)]
 
-extern std::vector<Sample> g_samples;
 
 /*
  * Read an interpolated sample from the given buffer.
@@ -109,7 +96,7 @@ extern std::vector<Sample> g_samples;
  * we sample the upper-right and lower-left adjacent values and lerp between them
  * based on the sample's position on the diagonal.
  */
-double Analyzer::sample( const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
+double Analyzer::sample(const vector<unsigned char>& buffer, const Vec2& mapDims, const Vec2& pos) {
   double left = floor(pos.x);
   double right = ceil(pos.x);
   double top = floor(pos.y);
@@ -118,13 +105,13 @@ double Analyzer::sample( const vector<unsigned char>& buffer, const Vec2& mapDim
   // samplePositions.push_back(pos);
   // these `if`s could be consolidated and cleaned up quite a bit.
 
-  if (abs(left - pos.x) <= DOUBLE_EPSION)
+  if (abs(left - pos.x) <= DOUBLE_EPSILON)
     right = left;
-  else if (abs(right - pos.x) <= DOUBLE_EPSION)
+  else if (abs(right - pos.x) <= DOUBLE_EPSILON)
     left = right;
-  if (abs(pos.y - top) <= DOUBLE_EPSION)
+  if (abs(pos.y - top) <= DOUBLE_EPSILON)
     bottom = top;
-  else if (abs(bottom - pos.y) <= DOUBLE_EPSION)
+  else if (abs(bottom - pos.y) <= DOUBLE_EPSILON)
     top = bottom;
 
   double lerpFactor = 0;
@@ -135,13 +122,11 @@ double Analyzer::sample( const vector<unsigned char>& buffer, const Vec2& mapDim
     lerpFactor = (bottom - pos.y) / (bottom - top);
   }
 
-
   double a = SAMPLE(Vec2(right,top));
   double b = SAMPLE(Vec2(left,bottom));
 
-  g_samples.push_back(Sample { pos, Vec2(right,top), Vec2(left,bottom), lerpFactor});
-
   double result = lerp(a, b, lerpFactor);
+  DebugSample::record(DebugSample{pos, Vec2(right, top), Vec2(left, bottom), lerpFactor, a, b, result});
   // cout << a << " " << b << " " << result << endl;
 
   return result;
@@ -173,7 +158,7 @@ double getSpatialDistance(const Vec2& p0, const double h0, const Vec2& p1, const
  * sample positions are identical, in practice, this doesn't provide a noticeable perf benefit
  * vs running the single-path version once for each map. That may not be the case for extremely large data sets.
  */
-double Analyzer::CalculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& mapDims,
+double Analyzer::calculatePathLength(const std::vector<unsigned char>& heightMap, const Vec2& mapDims,
                                      const Vec2& start, const Vec2& end) {
   const Vec2 boundsMin(min(start.x, end.x), min(start.y, end.y));
   const Vec2 boundsMax(max(start.x, end.x), max(start.y, end.y));
