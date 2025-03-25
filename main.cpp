@@ -128,6 +128,13 @@ int main(int argc, char** argv) {
 
     runTests(mapDims, beforeData, afterData);
 
+    float x = 1/0.0f;
+    if (1 < x)
+        cout << "Yes\n";
+    else
+        cout << "No\n";
+
+
     Vec2 start;
     Vec2 end;
     cout << "Enter four integer values in x0 y0 x1 y1 order. Ctrl+C to exit." << endl;
