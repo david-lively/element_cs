@@ -23,7 +23,7 @@ A spatial distance is then calculated between this point `cx,cy,h` and the previ
 ```
 Vec2 intersection = ... ; // find intersection with raycast. 
 float dx = intersection.x - prevIntersection.x;
-float dy = intersection.y - prevItnersection.y;
+float dy = intersection.y - prevIntersection.y;
 float height =  sample(heightMap,dx,dy);
 float dh = height - prevHeight;
 
