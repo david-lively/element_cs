@@ -22,7 +22,7 @@ those quads. For every encountered intersection point, two height map values are
 A spatial distance is then calculated between this point `cx,cy,h` and the previous point. 
 ```
 Vec2 intersection = ... ; // find intersection with raycast. 
-float dx = interesection.x - prevIntersection.x;
+float dx = intersection.x - prevIntersection.x;
 float dy = intersection.y - prevItnersection.y;
 float height =  sample(heightMap,dx,dy);
 float dh = height - prevHeight;
