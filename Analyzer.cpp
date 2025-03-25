@@ -90,7 +90,7 @@ double distance(const Vec2& a, const Vec2& b) {
  * Read an interpolated sample from the given buffer.
  * Sample positions lying on an integer X will be interpolated between their neighbors on
  * the edge where the intersection lies.
- * Those on an integer Y will be interpolated from their upper and lower neighbors.
+ * Those on an integer Y will be interpolated from their left and right neighbors.
  * If the point is exactly on a pixel (within epsilon), no interpolation is performed.
  * For sample positions within a cell, we assume it is on a diagonal edge. In that case,
  * we sample the upper-right and lower-left adjacent values and lerp between them
@@ -150,9 +150,9 @@ double getSpatialDistance(const Vec2& p0, const double h0, const Vec2& p1, const
  * At each cell boundary or diagonal intersection, a height value is read
  * from the heightmap.
  * The sample point coordinates and height are then scaled to real-world dimensions
- * (30 meters in X and Y, 11 meters in height (Z)
+ * (30 meters in X and Y, 11 meters in height (H))
  * We then calculate the spatial distance between the current sample point and the previous
- * sample, and add that distance to the running total in pathLength.
+ * sample, and add the result to the running total in pathLength.
  *
  * While it's more efficient to do both the old and new heightmaps at once since all of the
  * sample positions are identical, in practice, this doesn't provide a noticeable perf benefit
