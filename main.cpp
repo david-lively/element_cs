@@ -122,8 +122,8 @@ int main(int argc, char** argv) {
     Vec2 mapDims(512, 512);
 
     cout << "Loading maps...";
-    auto beforeData = Analyzer::LoadHeightmap("data/st-helens/pre.data");
-    auto afterData = Analyzer::LoadHeightmap("data/st-helens/post.data");
+    auto beforeData = Analyzer::loadHeightmap("data/st-helens/pre.data");
+    auto afterData = Analyzer::loadHeightmap("data/st-helens/post.data");
     cout << "Done." << endl;
 
     runTests(mapDims, beforeData, afterData);

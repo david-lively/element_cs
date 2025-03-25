@@ -10,7 +10,7 @@
 
 using namespace std;
 
-vector<unsigned char> Analyzer::LoadHeightmap(const std::string& path) {
+vector<unsigned char> Analyzer::loadHeightmap(const std::string& path) {
   ifstream input(path, ios::binary);
   if (input.fail()) {
     cerr << "Could not open file `" << path << "`" << endl;
