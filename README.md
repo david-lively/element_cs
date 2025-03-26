@@ -45,7 +45,7 @@ This illustration shows the intersection points (circles) and the edges that are
 
 <img width="515" alt="image" src="https://github.com/user-attachments/assets/a1ccd04f-6ee1-4124-95b7-cf1274acc7ab" />
 
-# Know Issues
+# Retrospective and Known Issues
 In the earlier version there was a small delta (< 30 meters) when calculating the diagonal from positions `0,0` to `511,511`. 
 This turned out to be the result of two problems:
 1. Duplicate samples on the split diagonal test. 
